@@ -25,6 +25,8 @@ const app = express()
 app.use(bodyParser.json())
 app.use(cors())
 
+app.get('/', (req, res) => {res.send('We are working')})
+
 //Post call which validates and signs in a user
 app.post('/signin', signin.handleSignIn(db, bcrypt))
 
@@ -41,8 +43,6 @@ app.put('/image', image.handleImage(db))
 app.post('/imageUrl', image.handleApiCall)
 
 //Initial function on run
-const PORT = process.env.PORT
-console.log(PORT)
-app.listen(PORT || 3000, () => {
-	console.log('app is running on port 3000')
+app.listen(process.env.PORT || 3000, () => {
+	console.log(`Server is running on port ${process.env.PORT}`)
 })
