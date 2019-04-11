@@ -1,6 +1,6 @@
 const handleRegister = (db, bcrypt) => (req, res) => {
 	const {email, name, password} = req.body
-	//Validation of data received
+	//Server side validation
 	if(!email || !password || !name){
 		return res.status(400).json('Invalid submission')
 	}
@@ -12,7 +12,9 @@ const handleRegister = (db, bcrypt) => (req, res) => {
   	return res.status(400).json('Invalid submission')
   }
 
+  //Hash the password
 	bcrypt.hash(password, null, null, function(err, hash) {
+		//Create db transations
 		db.transaction(trx => {
 			trx.insert({
 				name: name,
@@ -20,8 +22,11 @@ const handleRegister = (db, bcrypt) => (req, res) => {
 				joined: new Date()
 				
 			})
+			//First into users table
 			.into('users')
 			.returning('*')
+			//then into login table (foreign key email references users(email))
+			//insert hash here, not password string
 			.then(user => {
 				return trx('login')
 				.returning('*')
@@ -31,6 +36,7 @@ const handleRegister = (db, bcrypt) => (req, res) => {
 				})
 				.then(res.json(user[0]))
 			})
+			// Commit trx and rollback if fails
 			.then(trx.commit)
 			.catch(trx.rollback)
 		})

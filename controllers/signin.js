@@ -1,6 +1,6 @@
 const handleSignIn = (db, bcrypt) => (req, res) => {	
 	const {email, password} = req.body
-	//Validation of data received
+	//Server side validation
 	if(!email || !req.body.password){
 		return res.status(400).json('Invalid submission')
 	}
@@ -11,8 +11,13 @@ const handleSignIn = (db, bcrypt) => (req, res) => {
     password.length < 8 || !strongRegex.test(password)){
   	return res.status(400).json('Invalid submission')
   }
+
+  //Search for email that user has entered in login table
 	db('login').where({ email: email})
 	.then(data => {
+		//Once found compare the hash of the password string received
+		//with the hash stored in our db
+		//If successful return the user, otherwise return invalid login
 		bcrypt.compare(password, data[0].hash, function(err, result) {
 				if(result){
 					return db('users').where({email: data[0].email})

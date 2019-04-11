@@ -1,4 +1,5 @@
- const handleProfileGet = (db) => (req, res) => {
+//Searches db for the user by ID and returns the user
+const handleProfileGet = (db) => (req, res) => {
 	const { id } = req.params
 	db('users').where({id}).then(user => {
 		if(user === undefined || user.length === 0){
